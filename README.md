@@ -4,10 +4,10 @@ This plugin adds [barryvdh/ide-helpers](https://github.com/barryvdh/laravel-ide-
 
 ## Installation
 
-* `git clone` into */plugins/filipac/idehelper*
-* `composer install`
-* `php artisan ide-helper:generate --helpers --no-interaction`
-* `php artisan ide-helper:models --nowrite --reset --no-interaction`
+- `composer require filipac/oc-idehelper-plugin` OR `git clone` into _/plugins/filipac/idehelper_
+- `composer install`
+- `php artisan ide-helper:generate --helpers --no-interaction`
+- `php artisan ide-helper:models --nowrite --reset --no-interaction`
 
 ## Configuration
 
@@ -15,4 +15,4 @@ No configuration is necessary, but for use of `php artisan ide-helper:models` yo
 
 ## TODO
 
-* Auto clear-compiled/generate/optimize after update
+- Auto clear-compiled/generate/optimize after update
