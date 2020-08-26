@@ -5,7 +5,6 @@ This plugin adds [barryvdh/ide-helpers](https://github.com/barryvdh/laravel-ide-
 ## Installation
 
 - `composer require filipac/oc-idehelper-plugin` OR `git clone` into _/plugins/filipac/idehelper_
-- `composer install`
 - `php artisan ide-helper:generate --helpers --no-interaction`
 - `php artisan ide-helper:models --nowrite --reset --no-interaction`
 
