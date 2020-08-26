@@ -26,7 +26,9 @@ use Illuminate\Support\Str;
 use October\Rain\Database\Model as DatabaseModel;
 use Opis\Closure\ReflectionClosure;
 use phpDocumentor\Reflection\Types\ContextFactory;
+use RainLab\User\Models\User;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionFunction;
 use ReflectionObject;
 use ReflectionProperty;
@@ -259,20 +261,37 @@ class ModelsCommand extends Command
 
                         $model2 = $reflectionClass->newInstance();
                         $data = $property->getValue($model2);
-                        if (count($data['dynamicMethods']) > 0) {
-                            foreach ($data['dynamicMethods'] as $methodName => $closure) {
-                                $closureReflection = new ReflectionClosure($closure);
+
+                        // $appends = $propertyAppends->getValue($model2);
+                        // if (count($appends) > 0) {
+                        //     foreach ($appends as $prop) {
+                        //         if (!array_key_exists($prop, $this->properties)) {
+                        //             $this->modelClass = ($model2);
+                        //             $this->addProps($model2->getClassMethods(), $model2, $data);
+                        //         }
+                        //     }
+                        // }
+                        $this->modelClass = ($model2);
+                        $dynamicMethods = array_values(array_unique(array_merge(
+                            array_keys($data['methods']),
+                            array_keys($data['dynamicMethods'])
+                        )));
+
+                        $this->addProps($dynamicMethods, $model2, $data);
+
+                        if (count($dynamicMethods) > 0) {
+                            foreach ($dynamicMethods as $methodName => $closure) {
+                                $closureReflection = $this->getAReflection($model2, $closure, $data);
                                 $this->setMethod($methodName, '', $this->getParameters($closureReflection));
                             }
                         }
-
-                        $appends = $propertyAppends->getValue($model2);
-                        if (count($appends) > 0) {
-                            foreach ($appends as $prop) {
-                                if (!array_key_exists($prop, $this->properties)) {
-                                    $this->modelClass = ($model2);
-                                    $this->addProps($model2->getClassMethods(), $model2, $data);
+                        if (count($data['dynamicProperties']) > 0) {
+                            foreach ($data['dynamicProperties'] as $_prop) {
+                                $type = gettype($model2->{$_prop});
+                                if ($type == 'object') {
+                                    $type = '\\'.get_class($type);
                                 }
+                                $this->setProperty($_prop, $type, true, null, 'Added using addDynamicProperty');
                             }
                         }
 
@@ -573,16 +592,24 @@ class ModelsCommand extends Command
     {
         try {
             return new \ReflectionMethod($model, $method);
-        } catch (\Exception $e) {
+        } catch (ReflectionException $e) {
             if ($extensionData && isset($extensionData['methods'][$method])) {
                 $m = $extensionData['methods'][$method];
                 if ($m instanceof Closure) {
                     return new ReflectionFunction($m);
+                } elseif (is_string($m) && isset($extensionData['extensions'][$m])) {
+                    $reflectionExtension = new ReflectionClass($extensionData['extensions'][$m]);
+                    $refMethod = $reflectionExtension->getMethod($method);
+                    return $refMethod;
                 }
             } elseif ($extensionData && isset($extensionData['dynamicMethods'][$method])) {
                 $m = $extensionData['dynamicMethods'][$method];
                 if ($m instanceof Closure) {
                     return new ReflectionFunction($m);
+                } elseif (is_string($m) && isset($extensionData['extensions'][$m])) {
+                    $reflectionExtension = new ReflectionClass($extensionData['extensions'][$m]);
+                    $refMethod = $reflectionExtension->getMethod($method);
+                    return $refMethod;
                 }
             }
         }
