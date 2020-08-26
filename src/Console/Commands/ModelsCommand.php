@@ -51,7 +51,7 @@ class ModelsCommand extends Command
      *
      * @var string
      */
-    protected $name = 'ide-helper:models_october';
+    protected $name = 'ide-helper:models';
     protected $filename = '_ide_helper_models.php';
 
     /**
@@ -262,7 +262,7 @@ class ModelsCommand extends Command
                         if (count($data['dynamicMethods']) > 0) {
                             foreach ($data['dynamicMethods'] as $methodName => $closure) {
                                 $closureReflection = new ReflectionClosure($closure);
-                                // $this->setMethod($methodName, '', $this->getParameters($closureReflection));
+                                $this->setMethod($methodName, '', $this->getParameters($closureReflection));
                             }
                         }
 
@@ -271,10 +271,9 @@ class ModelsCommand extends Command
                             foreach ($appends as $prop) {
                                 if (!array_key_exists($prop, $this->properties)) {
                                     $this->modelClass = ($model2);
-                                    // $this->addProps($model2->getClassMethods(), $model2, $data);
+                                    $this->addProps($model2->getClassMethods(), $model2, $data);
                                 }
                             }
-                            // dd($appends, $this->properties);
                         }
 
                         if ($reflectionClass->isSubclassOf(DatabaseModel::class)) {
@@ -332,10 +331,6 @@ class ModelsCommand extends Command
                                             get_class($relationObj->getRelated())
                                         );
 
-                                        // if ($relname == 'appointments_practitioner') {
-                                        //     dd($type, $collectionClassNameInModel . '|' . $relatedModel . '[]');
-                                        // }
-
 
                                         $this->setProperty(
                                             $relname,
@@ -345,7 +340,7 @@ class ModelsCommand extends Command
                                             '',
                                             $this->isRelationNullable($type, $relationObj)
                                         );
-                                        // $this->setMethod($relname, '\\'.get_class($relationObj), []);
+                                        $this->setMethod($relname, '\\'.get_class($relationObj), []);
                                     }
                                 }
                             }
