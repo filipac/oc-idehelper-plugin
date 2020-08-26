@@ -289,7 +289,7 @@ class ModelsCommand extends Command
                             foreach ($data['dynamicProperties'] as $_prop) {
                                 $type = gettype($model2->{$_prop});
                                 if ($type == 'object') {
-                                    $type = '\\'.get_class($type);
+                                    $type = '\\'.get_class($model2->{$_prop});
                                 }
                                 $this->setProperty($_prop, $type, true, null, 'Added using addDynamicProperty');
                             }
