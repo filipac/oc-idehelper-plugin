@@ -30,6 +30,7 @@ use RainLab\User\Models\User;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionMethod;
 use ReflectionObject;
 use ReflectionProperty;
 use Symfony\Component\Console\Input\InputArgument;
@@ -272,16 +273,24 @@ class ModelsCommand extends Command
                         //     }
                         // }
                         $this->modelClass = ($model2);
-                        $dynamicMethods = array_values(array_unique(array_merge(
+                        $arr = array_unique(array_merge(
                             array_keys($data['methods']),
                             array_keys($data['dynamicMethods'])
-                        )));
+                        ));
+
+                        $dynamicMethods = array_values($arr);
 
                         $this->addProps($dynamicMethods, $model2, $data);
 
-                        if (count($dynamicMethods) > 0) {
-                            foreach ($dynamicMethods as $methodName => $closure) {
-                                $closureReflection = $this->getAReflection($model2, $closure, $data);
+                        if (count($arr) > 0) {
+                            foreach ($arr as $methodName) {
+                                $closure = isset($data['methods'][$methodName]) ? $data['methods'][$methodName] : $data['dynamicMethods'][$methodName];
+                                if (is_string($closure) && class_exists($closure)) {
+                                    // $closureReflection = ;
+                                    $closureReflection = new ReflectionMethod($closure, $methodName);
+                                } else {
+                                    $closureReflection = $this->getAReflection($model2, $closure, $data);
+                                }
                                 $this->setMethod($methodName, '', $this->getParameters($closureReflection));
                             }
                         }
@@ -591,8 +600,11 @@ class ModelsCommand extends Command
     protected function getAReflection($model, $method, $extensionData)
     {
         try {
+            if ($method instanceof Closure) {
+                return new ReflectionFunction(($method));
+            }
             return new \ReflectionMethod($model, $method);
-        } catch (ReflectionException $e) {
+        } catch (\Exception $e) {
             if ($extensionData && isset($extensionData['methods'][$method])) {
                 $m = $extensionData['methods'][$method];
                 if ($m instanceof Closure) {
