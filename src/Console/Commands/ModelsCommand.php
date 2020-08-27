@@ -31,6 +31,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionObject;
 use ReflectionProperty;
 use Symfony\Component\Console\Input\InputArgument;
@@ -291,7 +292,13 @@ class ModelsCommand extends Command
                                 } else {
                                     $closureReflection = $this->getAReflection($model2, $closure, $data);
                                 }
-                                $this->setMethod($methodName, '', $this->getParameters($closureReflection));
+                                $returnType = $closureReflection->getReturnType();
+                                if ($returnType instanceof ReflectionNamedType) {
+                                    $returnType = $returnType->getName();
+                                } elseif (!is_string($returnType)) {
+                                    $returnType = '';
+                                }
+                                $this->setMethod($methodName, $returnType, $this->getParameters($closureReflection));
                             }
                         }
                         if (count($data['dynamicProperties']) > 0) {
