@@ -296,7 +296,7 @@ class ModelsCommand extends Command
                                 if ($returnType instanceof ReflectionNamedType) {
                                     $returnType = $returnType->getName();
                                 } elseif (!is_string($returnType)) {
-                                    $returnType = '';
+                                    $returnType = 'void';
                                 }
                                 $this->setMethod($methodName, $returnType, $this->getParameters($closureReflection));
                             }
