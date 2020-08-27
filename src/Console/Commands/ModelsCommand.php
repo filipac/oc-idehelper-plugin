@@ -294,7 +294,7 @@ class ModelsCommand extends Command
                                 }
                                 $returnType = $closureReflection->getReturnType();
                                 if ($returnType instanceof ReflectionNamedType) {
-                                    $returnType = $returnType->getName();
+                                    $returnType = '\\'.$returnType->getName();
                                 } elseif (!is_string($returnType)) {
                                     $returnType = 'void';
                                 }
