@@ -22,7 +22,7 @@
   ],
   "require": {
     "composer/installers": "~1.0",
-    "barryvdh/laravel-ide-helper": "^2.7",
+    "barryvdh/laravel-ide-helper": "^2.8",
     "illuminate/support": "~5.5.40|~6.0"
   },
   "autoload": {
